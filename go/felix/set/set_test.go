@@ -27,6 +27,21 @@ var _ = Describe("Set", func() {
 		s = set.New()
 	})
 
+	Describe("Set created by FromArray", func() {
+		BeforeEach(func() {
+			s = set.FromArray([]int{1, 2})
+		})
+		It("should contain 1", func() {
+			Expect(s.Contains(1)).To(BeTrue())
+		})
+		It("should contain 2", func() {
+			Expect(s.Contains(2)).To(BeTrue())
+		})
+		It("should not contain 3", func() {
+			Expect(s.Contains(3)).To(BeFalse())
+		})
+	})
+
 	Describe("after adding 1 and 2", func() {
 		BeforeEach(func() {
 			s.Add(1)
@@ -116,6 +131,23 @@ var _ = Describe("Set", func() {
 			})
 			It("should not contain 3", func() {
 				Expect(s.Contains(3)).To(BeFalse())
+			})
+		})
+		Describe("after using AddAll to add 2, 3, 4", func() {
+			BeforeEach(func() {
+				s.AddAll([]int{2, 3, 4})
+			})
+			It("should contain 1", func() {
+				Expect(s.Contains(1)).To(BeTrue())
+			})
+			It("should contain 2", func() {
+				Expect(s.Contains(2)).To(BeTrue())
+			})
+			It("should contain 3", func() {
+				Expect(s.Contains(3)).To(BeTrue())
+			})
+			It("should contain 4", func() {
+				Expect(s.Contains(4)).To(BeTrue())
 			})
 		})
 	})
