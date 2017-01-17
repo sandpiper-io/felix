@@ -42,6 +42,21 @@ var _ = Describe("Set", func() {
 		})
 	})
 
+	Describe("Set created by From", func() {
+		BeforeEach(func() {
+			s = set.From(1, 2)
+		})
+		It("should contain 1", func() {
+			Expect(s.Contains(1)).To(BeTrue())
+		})
+		It("should contain 2", func() {
+			Expect(s.Contains(2)).To(BeTrue())
+		})
+		It("should not contain 3", func() {
+			Expect(s.Contains(3)).To(BeFalse())
+		})
+	})
+
 	Describe("after adding 1 and 2", func() {
 		BeforeEach(func() {
 			s.Add(1)

@@ -44,6 +44,12 @@ func New() Set {
 	return make(mapSet)
 }
 
+func From(members ...interface{}) Set {
+	s := New()
+	s.AddAll(members)
+	return s
+}
+
 func FromArray(membersArray interface{}) Set {
 	s := New()
 	s.AddAll(membersArray)
