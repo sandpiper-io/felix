@@ -300,7 +300,48 @@ func (r *RouteTable) syncRoutesForLink(ifaceName string) error {
 				Protocol:  syscall.RTPROT_BOOT,
 				Scope:     netlink.SCOPE_LINK,
 			}
-			if err := r.dataplane.RouteAdd(&route); err != nil {
+			err := r.dataplane.RouteAdd(&route)
+			if err == syscall.EEXIST {
+				logCxt.Info("Addig multipath route")
+				routes, err := netlink.RouteList(nil, netlink.FAMILY_V4)
+				logCxt.Info("IPNet: ", ipNet)
+				for _, route := range routes {
+					logCxt.Info("route: ", route)
+					if route.Dst != nil && route.Dst.IP.Equal(ipNet.IP) {
+						logCxt.Info("existing routes: ", route)
+						logCxt.Info("multipath: ", route.MultiPath)
+						multipath := []*netlink.NexthopInfo{}
+						if len(route.MultiPath) == 0 {
+							multipath = append(multipath,
+								&netlink.NexthopInfo{
+									LinkIndex: route.LinkIndex,
+									Hops:      0,
+								})
+						} else {
+							multipath = route.MultiPath[:]
+						}
+						logCxt.Info(multipath)
+						multipath = append(multipath,
+							&netlink.NexthopInfo{
+								LinkIndex: link.Attrs().Index,
+								Hops:      0,
+							})
+						logCxt.Info(multipath)
+						newRoute := netlink.Route{
+							Dst:       ipNet,
+							Type:      syscall.RTN_UNICAST,
+							Protocol:  syscall.RTPROT_BOOT,
+							Scope:     netlink.SCOPE_LINK,
+							MultiPath: multipath,
+						}
+						err = netlink.RouteReplace(&newRoute)
+						if err != nil {
+							logCxt.WithError(err).Warn("Failed to add multipath route")
+							updatesFailed = true
+						}
+					}
+				}
+			} else if err != nil {
 				logCxt.WithError(err).Warn("Failed to add route")
 				updatesFailed = true
 			}
