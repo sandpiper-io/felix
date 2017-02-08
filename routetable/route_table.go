@@ -328,7 +328,7 @@ func (r *RouteTable) syncRoutesForLink(ifaceName string) error {
 							})
 						logCxt.Info(multipath)
 						newRoute := netlink.Route{
-							Dst:       ipNet,
+							Dst:       &ipNet,
 							Type:      syscall.RTN_UNICAST,
 							Protocol:  syscall.RTPROT_BOOT,
 							Scope:     netlink.SCOPE_LINK,
